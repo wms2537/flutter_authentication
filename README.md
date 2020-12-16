@@ -1,6 +1,9 @@
-# flutter_authentication
+# Flutter Authentication
 
-A new Flutter project.
+A flutter authentication sample.
+
+## Backend
+The backend is based on my [Nodejs Authentication Backend](https://github.com/wms2537/nodejs-jwt-auth).
 
 ## Getting Started
 
