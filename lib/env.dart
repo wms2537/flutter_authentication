@@ -1,3 +1,3 @@
 const environment = {
-  'apiUrl': 'http://192.168.0.173'
+  'apiUrl': 'http://192.168.0.173:5000'
 } ;

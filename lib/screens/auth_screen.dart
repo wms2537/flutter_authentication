@@ -24,11 +24,11 @@ class AuthScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color.fromRGBO(215, 117, 255, 1).withOpacity(0.5),
-                  Color.fromRGBO(255, 188, 117, 1).withOpacity(0.9),
+                  const Color(0xff7fb9e5),
+                  const Color(0xff394496),
                 ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
                 stops: [0, 1],
               ),
             ),
@@ -51,7 +51,7 @@ class AuthScreen extends StatelessWidget {
                       // ..translate(-10.0),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: Colors.deepOrange.shade900,
+                        color: Colors.blue,
                         boxShadow: [
                           BoxShadow(
                             blurRadius: 8,
@@ -72,8 +72,9 @@ class AuthScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  SizedBox(height: deviceSize.height*0.1),
                   Flexible(
-                    flex: deviceSize.width > 600 ? 2 : 1,
+                    flex: 1,
                     child: AuthCard(),
                   ),
                 ],
@@ -137,7 +138,7 @@ class _AuthCardState extends State<AuthCard> {
         _authData['password'],
       );
     } on HttpException catch (error) {
-      const errorMessage = 'Authentication failed';
+      final errorMessage = error.message;
       _showErrorDialog(errorMessage);
     } catch (error) {
       const errorMessage =
@@ -153,15 +154,9 @@ class _AuthCardState extends State<AuthCard> {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      elevation: 8.0,
-      child: Container(
-        height: 260,
-        constraints:
-            BoxConstraints(minHeight: 260),
+    return Container(
+        height: deviceSize.height*0.5,
+        constraints: BoxConstraints(minHeight: deviceSize.height*0.5),
         width: deviceSize.width * 0.75,
         padding: EdgeInsets.all(16.0),
         child: Form(
@@ -187,35 +182,39 @@ class _AuthCardState extends State<AuthCard> {
                   },
                 ),
                 SizedBox(
-                  height: 20,
+                  height: deviceSize.height*0.05,
                 ),
                 if (_isLoading)
                   CircularProgressIndicator()
                 else
-                  RaisedButton(
-                    child: const Text('Log In'),
-                    onPressed: _submit,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                  ButtonTheme(
+                    minWidth: deviceSize.width * 0.75,
+                    height: deviceSize.height*0.05,
+                    child: FlatButton(
+                      child: Text('LOGIN'),
+                      onPressed: _submit,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+                      color: Theme.of(context).primaryColor,
+                      textColor:
+                          Theme.of(context).primaryTextTheme.button.color,
                     ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
-                    color: Theme.of(context).primaryColor,
-                    textColor: Theme.of(context).primaryTextTheme.button.color,
                   ),
                 FlatButton(
                   child: Text('Sign Up'),
                   onPressed: () =>
                       Navigator.of(context).pushNamed(SignUpScreen.routeName),
-                  padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  textColor: Theme.of(context).primaryColor,
+                  textColor: Theme.of(context).accentColor,
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

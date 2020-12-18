@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/http_exception.dart';
-import './product.dart';
 
 class Products with ChangeNotifier {
-  List<Product> _items = [];
   // var _showFavoritesOnly = false;
   String _authToken;
   String _userId;

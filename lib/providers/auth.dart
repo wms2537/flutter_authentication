@@ -17,6 +17,7 @@ class Auth with ChangeNotifier {
   DateTime _refreshTokenExpiry;
   String _userId;
   Timer _authTimer;
+  Timer _refreshTimer;
 
   bool get isAuth {
     return token != null;
@@ -42,6 +43,7 @@ class Auth with ChangeNotifier {
     try {
       final response = await http.post(
         url,
+        headers: {'Content-Type': 'application/json'},
         body: json.encode(
           {
             'email': email,
@@ -50,8 +52,8 @@ class Auth with ChangeNotifier {
         ),
       );
       final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
+      if (response.statusCode != 200) {
+        throw HttpException(responseData['message']);
       }
       _accessToken = responseData['accessToken'];
       _refreshToken = responseData['refreshToken'];
@@ -82,6 +84,7 @@ class Auth with ChangeNotifier {
     try {
       final response = await http.post(
         url,
+        headers: {'Content-Type': 'application/json'},
         body: json.encode(
           {
             'email': email,
@@ -93,8 +96,8 @@ class Auth with ChangeNotifier {
         ),
       );
       final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
+      if (response.statusCode != 201) {
+        throw HttpException(responseData['message']);
       }
     } catch (error) {
       throw error;
@@ -129,6 +132,7 @@ class Auth with ChangeNotifier {
     try {
       final response = await http.post(
         url,
+        headers: {'Content-Type': 'application/json'},
         body: json.encode(
           {
             'accessToken': _accessToken,
@@ -137,8 +141,8 @@ class Auth with ChangeNotifier {
         ),
       );
       final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
+      if (response.statusCode != 200) {
+        throw HttpException(responseData['message']);
       }
       _accessToken = responseData['token'];
       
@@ -169,6 +173,10 @@ class Auth with ChangeNotifier {
       _authTimer.cancel();
       _authTimer = null;
     }
+    if (_refreshTimer != null) {
+      _refreshTimer.cancel();
+      _refreshTimer = null;
+    }
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     // prefs.remove('userData');
@@ -180,6 +188,8 @@ class Auth with ChangeNotifier {
       _authTimer.cancel();
     }
     final timeToExpiry = _refreshTokenExpiry.difference(DateTime.now()).inSeconds;
+    final timeToRefresh = _accessTokenExpiry.difference(DateTime.now()).inSeconds;
+    _refreshTimer = Timer(Duration(seconds: timeToRefresh), refreshToken);
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 }

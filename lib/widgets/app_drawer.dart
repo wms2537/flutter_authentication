@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_authentication/providers/auth.dart';
+import 'package:flutter_authentication/screens/auth_screen.dart';
+import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -17,6 +20,13 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pushReplacementNamed('/');
             },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text('Logout'),
+            onTap: () =>
+              Provider.of<Auth>(context, listen: false).logout()
           ),
         ],
       ),

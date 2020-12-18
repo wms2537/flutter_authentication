@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_authentication/screens/home_screen.dart';
+import 'package:flutter_authentication/screens/signup_screen.dart';
 import 'package:provider/provider.dart';
 
 import './screens/splash_screen.dart';
@@ -32,8 +33,8 @@ class MyApp extends StatelessWidget {
         builder: (ctx, auth, _) => MaterialApp(
           title: 'Flutter Auth',
           theme: ThemeData(
-            primarySwatch: Colors.purple,
-            accentColor: Colors.deepOrange,
+            primarySwatch: Colors.blue,
+            accentColor: Colors.blueAccent,
             fontFamily: 'Lato',
           ),
           home: auth.isAuth
@@ -47,7 +48,9 @@ class MyApp extends StatelessWidget {
                           : AuthScreen(),
                 ),
           routes: {
-            HomeScreen.routeName : (ctx) => HomeScreen()
+            HomeScreen.routeName : (ctx) => HomeScreen(),
+            AuthScreen.routeName: (ctx) => AuthScreen(),
+            SignUpScreen.routeName: (ctx) => SignUpScreen()
           },
         ),
       ),

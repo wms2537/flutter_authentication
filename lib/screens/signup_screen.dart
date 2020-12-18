@@ -22,10 +22,12 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  var _isLoading = false;
-  var _agreedToTOS = false;
-  var _showTOSError = false;
-  bool _valid = false;
+  bool _isLoading = false;
+  bool _agreedToTOS = false;
+  bool _showTOSError = false;
+  final TextEditingController _phoneNumberController = TextEditingController();
+  String _initialCountry = 'MY';
+  PhoneNumber _number = PhoneNumber(isoCode: 'MY');
   final _passwordController = TextEditingController();
 
   Map<String, String> _authData = {
@@ -55,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _authData['password'],
         _authData['firstName'],
         _authData['lastName'],
-        _authData['phoneNumber'],
+        _authData['phoneNumber']
       );
       Navigator.of(context).pop();
     } catch (e) {
@@ -79,22 +81,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  void onPhoneNumberChanged(PhoneNumber phoneNumber) {
-    setState(() {
-      _authData['phoneNumber'] = phoneNumber.phoneNumber;
-    });
-  }
+  void getPhoneNumber(String phoneNumber) async {
+    PhoneNumber number =
+        await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
 
-  void onInputChanged(bool value) {
     setState(() {
-      _valid = value;
+      this._number = number;
     });
   }
 
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
-    _passwordController.dispose();
+    _passwordController?.dispose();
+    _phoneNumberController?.dispose();
     super.dispose();
   }
 
@@ -109,8 +109,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
               gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [const Color(0xff7fb9e5), const Color(0xff394496)],
-                  stops: [0, 0.9]),
+                  colors: [
+                    const Color(0xff7fb9e5),
+                    const Color(0xff394496),
+                  ],
+                  stops: [
+                    0,
+                    0.9
+                  ]),
             ),
           ),
           Positioned(
@@ -213,12 +219,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           height: deviceSize.height * 0.01,
                         ),
                         InternationalPhoneNumberInput(
-                            onInputChanged: onPhoneNumberChanged,
-                            onInputValidated: onInputChanged,
-                            inputDecoration: InputDecoration(
-                              hintText: 'Enter phone number',
-                              errorText: _valid ? null : 'Invalid',
-                            )),
+                          validator: Validator.validatePhoneNumber,
+                          onInputChanged: (PhoneNumber number) {
+                            _authData['phoneNumber'] = number.parseNumber();
+                          },
+                          onInputValidated: (bool value) {
+                          },
+                          selectorConfig: SelectorConfig(
+                            selectorType: PhoneInputSelectorType.DIALOG,
+                            backgroundColor: Colors.black,
+                          ),
+                          ignoreBlank: false,
+                          autoValidateMode: AutovalidateMode.disabled,
+                          selectorTextStyle: TextStyle(color: Colors.black),
+                          initialValue: _number,
+                          textFieldController: _phoneNumberController,
+                        ),
                         SizedBox(
                           height: deviceSize.height * 0.02,
                         ),
@@ -264,8 +280,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ? CircularProgressIndicator()
                             : ButtonTheme(
                                 minWidth: deviceSize.width * 0.75,
+                                height: deviceSize.height * 0.05,
                                 child: FlatButton(
-                                  child: const Text('Sign Up'),
+                                  child: Text('SIGN UP'),
                                   onPressed: () {
                                     if (!_agreedToTOS) {
                                       setState(() {
@@ -281,8 +298,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 30.0, vertical: 8.0),
-                                  color: Color(0x7f7df6fe),
+                                      horizontal: 30.0, vertical: 10.0),
+                                  color: Theme.of(context).primaryColor,
                                   textColor: Theme.of(context)
                                       .primaryTextTheme
                                       .button
